@@ -38,3 +38,7 @@ func MakeAndDoRequest(ctx context.Context, logger model.Logger, client *http.Cli
 	log.Debugf("request finished in %s", time.Since(sw))
 	return res, nil
 }
+
+func IsStatusCode2XX(statusCode int) bool {
+	return statusCode >= 200 && statusCode <= 299
+}

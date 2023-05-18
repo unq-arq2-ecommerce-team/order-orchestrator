@@ -22,6 +22,8 @@ func main() {
 	// repositories
 	customerRepo := http.NewCustomerRepository(baseLogger, http.NewClient(), &conf.CustomerUrl)
 	orderRepo := http.NewOrderRepository(baseLogger, http.NewClient(), &conf.OrderUrl)
+	notificationRepo := http.NewNotificationRepository(baseLogger, http.NewClient(), &conf.NotificationUrl)
+	paymentRepo := http.NewPaymentRepository(baseLogger, http.NewClient(), &conf.PaymentUrl)
 
 	// queries
 	findCustomerByIdQuery := query.NewFindCustomerById(customerRepo)
@@ -31,10 +33,12 @@ func main() {
 	createOrderCmd := command.NewCreateOrder(orderRepo)
 	confirmOrderCmd := command.NewConfirmOrder(orderRepo)
 	deliveredOrderCmd := command.NewDeliveredOrder(orderRepo)
+	sendNotificationCmd := command.NewSendNotification(notificationRepo)
+	payOrderCmd := command.NewPayOrder(paymentRepo)
 
 	// use cases
 	createOrderUseCase := usecase.NewCreateOrder(baseLogger, *findCustomerByIdQuery, *createOrderCmd)
-	payOrderUseCase := usecase.NewPayOrder(baseLogger, *findOrderByIdQuery, *confirmOrderCmd)
+	payOrderUseCase := usecase.NewPayOrder(baseLogger, *findOrderByIdQuery, *payOrderCmd, *confirmOrderCmd, *sendNotificationCmd)
 	deliveredOrderUseCase := usecase.NewDeliveredOrder(baseLogger, *deliveredOrderCmd)
 
 	app := api.NewApplication(baseLogger, conf, &api.ApplicationUseCases{

@@ -24,6 +24,6 @@ func (u DeliveredOrder) Do(ctx context.Context, orderId int64) error {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when delivered order")
 		return err
 	}
-	log.Info("successful order delivered")
+	log.Info("successfully delivered order")
 	return nil
 }

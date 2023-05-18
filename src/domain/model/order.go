@@ -25,7 +25,10 @@ type (
 		DeliveryAddress Address   `json:"deliveryAddress"`
 	}
 	Product struct {
-		Id int64 `json:"productId"`
+		Id       int64   `json:"productId"`
+		SellerId int64   `json:"sellerId"`
+		Name     string  `json:"name"`
+		Price    float64 `json:"price"`
 	}
 )
 

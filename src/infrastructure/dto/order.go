@@ -20,7 +20,3 @@ func (req *OrderCreateReq) Validate() error {
 	}
 	return nil
 }
-
-// TODO: Add fields for payment
-type OrderPaymentReq struct {
-}

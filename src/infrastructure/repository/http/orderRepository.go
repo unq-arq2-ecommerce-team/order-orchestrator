@@ -46,7 +46,7 @@ func (repo orderRepository) FindById(ctx context.Context, orderId int64) (*model
 	}
 
 	switch statusCode := res.StatusCode; {
-	case statusCode >= 200 && statusCode <= 299:
+	case IsStatusCode2XX(statusCode):
 		rawBody, _ := io.ReadAll(res.Body)
 		log = log.WithFields(model.LoggerFields{"bodyRaw": rawBody})
 		var order model.Order
@@ -74,7 +74,7 @@ func (repo orderRepository) Create(ctx context.Context, order model.Order) (int6
 	}
 
 	switch statusCode := res.StatusCode; {
-	case statusCode >= 200 && statusCode <= 299:
+	case IsStatusCode2XX(statusCode):
 		rawBody, _ := io.ReadAll(res.Body)
 		log = log.WithFields(model.LoggerFields{"bodyRaw": rawBody})
 		var orderIdRes dto.IdRes
@@ -100,9 +100,9 @@ func (repo orderRepository) Confirm(ctx context.Context, orderId int64) error {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return err
 	}
-	
+
 	switch statusCode := res.StatusCode; {
-	case statusCode >= 200 && statusCode <= 299:
+	case IsStatusCode2XX(statusCode):
 		rawBody, _ := io.ReadAll(res.Body)
 		log = log.WithFields(model.LoggerFields{"bodyRaw": rawBody})
 		var order model.Order
@@ -130,7 +130,7 @@ func (repo orderRepository) Delivered(ctx context.Context, orderId int64) error 
 	}
 
 	switch statusCode := res.StatusCode; {
-	case statusCode >= 200 && statusCode <= 299:
+	case IsStatusCode2XX(statusCode):
 		rawBody, _ := io.ReadAll(res.Body)
 		log = log.WithFields(model.LoggerFields{"bodyRaw": rawBody})
 		var order model.Order

@@ -23,19 +23,19 @@ func NewCreateOrder(baseLogger model.Logger, findCustomerByIdQuery query.FindCus
 
 // Do : If it is successful, returns orderId
 func (u *CreateOrder) Do(ctx context.Context, order model.Order) (int64, error) {
-	logger := u.baseLogger.WithRequestId(ctx).WithFields(model.LoggerFields{"order": order})
-	logger.Debug("creating order...")
+	log := u.baseLogger.WithRequestId(ctx).WithFields(model.LoggerFields{"order": order})
 
 	if _, err := u.findCustomerByIdQuery.Do(ctx, order.CustomerId); err != nil {
-		logger.WithFields(model.LoggerFields{"error": err}).Errorf("error when find customer by id %v", order.CustomerId)
+		log.WithFields(model.LoggerFields{"error": err}).Errorf("error when find customer by id %v", order.CustomerId)
 		return 0, err
 	}
 
 	orderId, err := u.createOrderCmd.Do(ctx, order)
 	if err != nil {
-		logger.WithFields(model.LoggerFields{"error": err}).Error("error when create order")
+		log.WithFields(model.LoggerFields{"error": err}).Error("error when create order")
 		return 0, err
 	}
 
+	log.Info("successfully created order")
 	return orderId, nil
 }

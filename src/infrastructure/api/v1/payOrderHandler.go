@@ -34,8 +34,11 @@ func PayOrderHandler(log model.Logger, payOrder *usecase.PayOrder) gin.HandlerFu
 			writeJsonErrorMessageInDescAndMessage(c, http.StatusBadRequest, "invalid json body order payment req", err)
 			return
 		}
-		//TODO: req. Map to => ???
-		if err := payOrder.Do(c.Request.Context(), id); err != nil {
+		if err := req.Validate(); err != nil {
+			writeJsonErrorMessageInDescAndMessage(c, http.StatusBadRequest, "invalid json body order payment req", err)
+			return
+		}
+		if err := payOrder.Do(c.Request.Context(), id, req.Map()); err != nil {
 			switch err.(type) {
 			case exception.OrderNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)

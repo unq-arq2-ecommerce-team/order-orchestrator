@@ -6,11 +6,13 @@ import (
 
 type (
 	Config struct {
-		Environment string            `required:"true" default:"development"`
-		Port        int               `required:"true" default:"8080"`
-		LogLevel    string            `split_words:"true" default:"DEBUG"`
-		OrderUrl    OrderEndpoints    `split_words:"true" required:"true"`
-		CustomerUrl CustomerEndpoints `split_words:"true" required:"true"`
+		Environment     string                `required:"true" default:"development"`
+		Port            int                   `required:"true" default:"8080"`
+		LogLevel        string                `split_words:"true" default:"DEBUG"`
+		OrderUrl        OrderEndpoints        `split_words:"true" required:"true"`
+		CustomerUrl     CustomerEndpoints     `split_words:"true" required:"true"`
+		NotificationUrl NotificationEndpoints `split_words:"true" required:"true"`
+		PaymentUrl      PaymentEndpoints      `split_words:"true" required:"true"`
 	}
 	OrderEndpoints struct {
 		FindById  string `split_words:"true" required:"true"`
@@ -20,6 +22,12 @@ type (
 	}
 	CustomerEndpoints struct {
 		FindById string `split_words:"true" required:"true"`
+	}
+	NotificationEndpoints struct {
+		Send string `split_words:"true" required:"true"`
+	}
+	PaymentEndpoints struct {
+		MakePayment string `split_words:"true" required:"true"`
 	}
 )
 

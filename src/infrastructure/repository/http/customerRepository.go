@@ -39,7 +39,7 @@ func (repo customerRepository) FindById(ctx context.Context, customerId int64) (
 		return nil, err
 	}
 	switch statusCode := res.StatusCode; {
-	case statusCode >= 200 && statusCode <= 299:
+	case IsStatusCode2XX(statusCode):
 		rawBody, _ := io.ReadAll(res.Body)
 		log = log.WithFields(logger.Fields{"bodyRaw": rawBody})
 		var customer model.Customer
