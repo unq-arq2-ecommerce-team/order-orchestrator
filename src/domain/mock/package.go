@@ -10,6 +10,7 @@ type InterfaceMocks struct {
 	CustomerRepo     *MockCustomerRepository
 	OrderRepo        *MockOrderRepository
 	NotificationRepo *MockNotificationRepository
+	PaymentRepo      *MockPaymentRepository
 }
 
 // NewInterfaceMocks create an *InterfaceMocks with their mocked interfaces initialized
@@ -23,6 +24,7 @@ func NewInterfaceMocks(t *testing.T) *InterfaceMocks {
 		CustomerRepo:     NewMockCustomerRepository(ctrl),
 		OrderRepo:        NewMockOrderRepository(ctrl),
 		NotificationRepo: NewMockNotificationRepository(ctrl),
+		PaymentRepo:      NewMockPaymentRepository(ctrl),
 	}
 }
 
