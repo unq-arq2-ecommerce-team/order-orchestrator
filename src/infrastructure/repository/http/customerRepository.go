@@ -33,7 +33,7 @@ func (repo customerRepository) FindById(ctx context.Context, customerId int64) (
 	url := strings.Replace(repo.findByIdUrl, "{customerId}", strconv.FormatInt(customerId, 10), -1)
 	log = repo.logger.WithFields(logger.Fields{"url": url})
 
-	res, err := MakeAndDoRequest(ctx, log, repo.client, http.MethodGet, url, nil)
+	res, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodGet, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return nil, err

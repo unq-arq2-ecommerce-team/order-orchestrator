@@ -39,7 +39,7 @@ func (repo orderRepository) FindById(ctx context.Context, orderId int64) (*model
 	url := strings.Replace(repo.findByIdUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
 
-	res, err := MakeAndDoRequest(ctx, log, repo.client, http.MethodGet, url, nil)
+	res, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodGet, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return nil, err
@@ -67,7 +67,7 @@ func (repo orderRepository) Create(ctx context.Context, order model.Order) (int6
 	orderDTO := dto.NewOrderDTO(order)
 	log.Debugf("orderDTO: %s", orderDTO)
 
-	res, err := MakeAndDoRequest(ctx, log, repo.client, http.MethodPost, url, orderDTO)
+	res, err := MakeAndDoRequestWithBody(ctx, log, repo.client, http.MethodPost, url, contentTypeJson, orderDTO)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return 0, err
@@ -95,7 +95,7 @@ func (repo orderRepository) Confirm(ctx context.Context, orderId int64) error {
 	url := strings.Replace(repo.confirmUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
 
-	res, err := MakeAndDoRequest(ctx, log, repo.client, http.MethodPost, url, nil)
+	res, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodPost, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return err
@@ -123,7 +123,7 @@ func (repo orderRepository) Delivered(ctx context.Context, orderId int64) error 
 	url := strings.Replace(repo.deliveredUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
 
-	res, err := MakeAndDoRequest(ctx, log, repo.client, http.MethodPost, url, nil)
+	res, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodPost, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return err

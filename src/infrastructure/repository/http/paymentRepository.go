@@ -29,7 +29,7 @@ func (repo paymentRepository) MakePayment(ctx context.Context, payment *model.Pa
 
 	log = repo.logger.WithFields(logger.Fields{"url": url})
 
-	res, err := MakeAndDoRequest(ctx, log, repo.client, http.MethodPost, url, payment)
+	res, err := MakeAndDoRequestWithBody(ctx, log, repo.client, http.MethodPost, url, contentTypeJson, payment)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return err
