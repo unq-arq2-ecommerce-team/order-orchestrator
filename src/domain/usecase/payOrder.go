@@ -28,7 +28,7 @@ func NewPayOrder(baseLogger model.Logger, findOrderByIdQuery query.FindOrderById
 }
 
 func (u *PayOrder) Do(ctx context.Context, orderId int64, payment *model.Payment) error {
-	log := u.baseLogger.WithFields(model.LoggerFields{"orderId": orderId, "payment": payment})
+	log := u.baseLogger.WithRequestId(ctx).WithFields(model.LoggerFields{"orderId": orderId, "payment": payment})
 	log.Debug("paying order ...")
 	order, err := u.findOrderByIdQuery.Do(ctx, orderId)
 	if err != nil {

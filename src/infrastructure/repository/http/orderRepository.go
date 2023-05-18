@@ -34,7 +34,7 @@ func NewOrderRepository(baseLogger model.Logger, client *http.Client, orderEndpo
 }
 
 func (repo orderRepository) FindById(ctx context.Context, orderId int64) (*model.Order, error) {
-	log := repo.logger.WithFields(model.LoggerFields{"findByIdUrl": repo.findByIdUrl, "orderId": orderId})
+	log := repo.logger.WithRequestId(ctx).WithFields(model.LoggerFields{"findByIdUrl": repo.findByIdUrl, "orderId": orderId})
 	log.Debugf("http find order by id")
 	url := strings.Replace(repo.findByIdUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
@@ -61,7 +61,7 @@ func (repo orderRepository) FindById(ctx context.Context, orderId int64) (*model
 
 func (repo orderRepository) Create(ctx context.Context, order model.Order) (int64, error) {
 	url := repo.createUrl
-	log := repo.logger.WithFields(model.LoggerFields{"createOrderUrl": url, "order": order})
+	log := repo.logger.WithRequestId(ctx).WithFields(model.LoggerFields{"createOrderUrl": url, "order": order})
 	log.Debugf("http create order")
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
 	orderDTO := dto.NewOrderDTO(order)
@@ -90,7 +90,7 @@ func (repo orderRepository) Create(ctx context.Context, order model.Order) (int6
 }
 
 func (repo orderRepository) Confirm(ctx context.Context, orderId int64) error {
-	log := repo.logger.WithFields(model.LoggerFields{"confirmUrl": repo.confirmUrl, "orderId": orderId})
+	log := repo.logger.WithRequestId(ctx).WithFields(model.LoggerFields{"confirmUrl": repo.confirmUrl, "orderId": orderId})
 	log.Debugf("http confirm order by id")
 	url := strings.Replace(repo.confirmUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
@@ -118,7 +118,7 @@ func (repo orderRepository) Confirm(ctx context.Context, orderId int64) error {
 }
 
 func (repo orderRepository) Delivered(ctx context.Context, orderId int64) error {
-	log := repo.logger.WithFields(model.LoggerFields{"deliveredUrl": repo.deliveredUrl, "orderId": orderId})
+	log := repo.logger.WithRequestId(ctx).WithFields(model.LoggerFields{"deliveredUrl": repo.deliveredUrl, "orderId": orderId})
 	log.Debugf("http delivered order by id")
 	url := strings.Replace(repo.deliveredUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})

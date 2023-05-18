@@ -24,7 +24,7 @@ func NewPaymentRepository(baseLogger model.Logger, client *http.Client, paymentE
 
 func (repo paymentRepository) MakePayment(ctx context.Context, payment *model.Payment) error {
 	url := repo.makePaymentUrl
-	log := repo.logger.WithFields(logger.Fields{"makePaymentUrl": url, "payment": payment})
+	log := repo.logger.WithRequestId(ctx).WithFields(logger.Fields{"makePaymentUrl": url, "payment": payment})
 	log.Debugf("making order payment...")
 
 	log = repo.logger.WithFields(logger.Fields{"url": url})

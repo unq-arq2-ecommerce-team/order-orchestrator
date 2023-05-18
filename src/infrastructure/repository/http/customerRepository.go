@@ -28,7 +28,7 @@ func NewCustomerRepository(baseLogger model.Logger, client *http.Client, custome
 }
 
 func (repo customerRepository) FindById(ctx context.Context, customerId int64) (*model.Customer, error) {
-	log := repo.logger.WithFields(logger.Fields{"findByIdUrl": repo.findByIdUrl, "customerId": customerId})
+	log := repo.logger.WithRequestId(ctx).WithFields(logger.Fields{"findByIdUrl": repo.findByIdUrl, "customerId": customerId})
 	log.Debugf("http find customer by id")
 	url := strings.Replace(repo.findByIdUrl, "{customerId}", strconv.FormatInt(customerId, 10), -1)
 	log = repo.logger.WithFields(logger.Fields{"url": url})

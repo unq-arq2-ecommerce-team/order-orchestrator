@@ -24,7 +24,7 @@ func NewNotificationRepository(baseLogger model.Logger, client *http.Client, not
 
 func (repo notificationRepository) Send(ctx context.Context, notification model.Notification) error {
 	url := repo.sendNotificationUrl
-	log := repo.logger.WithFields(logger.Fields{"sendNotificationUrl": url, "notification": notification})
+	log := repo.logger.WithRequestId(ctx).WithFields(logger.Fields{"sendNotificationUrl": url, "notification": notification})
 	log.Debugf("sending notification repository")
 
 	log = repo.logger.WithFields(logger.Fields{"url": url})

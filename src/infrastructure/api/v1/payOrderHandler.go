@@ -13,6 +13,7 @@ import (
 // PayOrderHandler
 // @Summary      Endpoint order payment
 // @Description  pay an order
+// @Param orderId path int true "Order ID" minimum(1)
 // @Param Order body dto.OrderPaymentReq true "It is a order payment request."
 // @Tags         Order
 // @Produce json

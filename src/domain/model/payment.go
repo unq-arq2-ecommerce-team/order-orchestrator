@@ -17,14 +17,14 @@ type (
 		Method     Method  `json:"method"`
 	}
 	Method struct {
-		Type    string  `json:"type" binding:"required,min=1,max=20"`
+		Type    string  `json:"type" binding:"required,min=1,max=20" example:"creditcard"`
 		Details Details `json:"details" binding:"required"`
 	}
 	// Details ExpirationDate format is "mm/yyyy"
 	Details struct {
-		Number         string `json:"number" binding:"required,len=16"`
-		ExpirationDate string `json:"expiration_date" binding:"required,len=7"`
-		Cvv            string `json:"cvv" binding:"required,len=3"`
+		Number         string `json:"number" binding:"required,len=16" example:"1234123412341234"`
+		ExpirationDate string `json:"expiration_date" binding:"required,len=7" example:"01/2030"`
+		Cvv            string `json:"cvv" binding:"required,len=3" example:"999"`
 		HolderName     string `json:"holder_name" binding:"required,min=2,max=60"`
 	}
 )
