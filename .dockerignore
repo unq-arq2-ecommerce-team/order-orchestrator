@@ -1,0 +1,13 @@
+.vscode/
+.idea/
+.git/
+doc/
+docs/
+spec/
+data/
+resources/
+*.md
+*.yaml
+*.yml
+.gitignore
+order-orchestrator
