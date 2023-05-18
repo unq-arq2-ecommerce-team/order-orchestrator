@@ -17,11 +17,3 @@ type OrderInvalidTransitionState struct {
 func (e OrderInvalidTransitionState) Error() string {
 	return fmt.Sprintf("invalid transition state for order with id %v", e.Id)
 }
-
-type OrderWasPaid struct {
-	Id int64
-}
-
-func (e OrderWasPaid) Error() string {
-	return fmt.Sprintf("order was paid for order with id %v", e.Id)
-}

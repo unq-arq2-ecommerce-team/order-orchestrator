@@ -6,7 +6,6 @@ import (
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/action/command"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/action/query"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/model"
-	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/model/exception"
 )
 
 type PayOrder struct {
@@ -37,9 +36,10 @@ func (u *PayOrder) Do(ctx context.Context, orderId int64, payment *model.Payment
 	}
 	log = log.WithFields(model.LoggerFields{"order": order})
 
+	// Idempotent
 	if order.WasPaid() {
-		log.Errorf("cannot pay order because not apply, orderState: %s", order.State)
-		return exception.OrderWasPaid{Id: orderId}
+		log.Info("order with id %v state %s was already paid", order.Id, order.State)
+		return nil
 	}
 
 	payment.Fill(order)

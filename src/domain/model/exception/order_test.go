@@ -26,14 +26,3 @@ func Test_OrderInvalidTransitionStateError(t *testing.T) {
 	assert.Equal(t, `invalid transition state for order with id 1`, e1.Error())
 	assert.Equal(t, `invalid transition state for order with id 2`, e2.Error())
 }
-
-func Test_OrderWasPaidError(t *testing.T) {
-	e1 := OrderWasPaid{
-		Id: 1,
-	}
-	e2 := OrderWasPaid{
-		Id: 2,
-	}
-	assert.Equal(t, `order was paid for order with id 1`, e1.Error())
-	assert.Equal(t, `order was paid for order with id 2`, e2.Error())
-}

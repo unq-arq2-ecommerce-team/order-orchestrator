@@ -20,7 +20,6 @@ import (
 // @Success 204
 // @Failure 400 {object} dto.ErrorMessage
 // @Failure 404 {object} dto.ErrorMessage
-// @Failure 406 {object} dto.ErrorMessage
 // @Router       /api/v1/order/{orderId}/pay [post]
 func PayOrderHandler(log model.Logger, payOrder *usecase.PayOrder) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -43,8 +42,6 @@ func PayOrderHandler(log model.Logger, payOrder *usecase.PayOrder) gin.HandlerFu
 			switch err.(type) {
 			case exception.OrderNotFound:
 				writeJsonErrorMessageWithNoDesc(c, http.StatusNotFound, err)
-			case exception.OrderWasPaid:
-				writeJsonErrorMessageWithNoDesc(c, http.StatusNotAcceptable, err)
 			default:
 				defaultInternalServerError(log, c, "uncaught error when create order", err)
 			}

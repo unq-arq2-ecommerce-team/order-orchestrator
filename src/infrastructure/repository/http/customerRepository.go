@@ -32,16 +32,19 @@ func (repo customerRepository) FindById(ctx context.Context, customerId int64) (
 	url := strings.Replace(repo.findByIdUrl, "{customerId}", strconv.FormatInt(customerId, 10), -1)
 	log = repo.logger.WithFields(logger.Fields{"url": url})
 
-	res, rawBody, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodGet, url)
+	res, resRawBody, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodGet, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return nil, err
 	}
 	switch statusCode := res.StatusCode; {
 	case IsStatusCode2XX(statusCode):
-		log.Debugf("Raw body: %s", string(rawBody))
+		log.Debugf("Raw body: %s", string(resRawBody))
 		var customer model.Customer
-		err = json.Unmarshal(rawBody, &customer)
+		if err := json.Unmarshal(resRawBody, &customer); err != nil {
+			log.WithFields(model.LoggerFields{"error": err, "rawBody": string(resRawBody)}).Errorf("error decoding res body")
+			return nil, NewUnexpectedError("customer repository", statusCode, url)
+		}
 		return &customer, nil
 	case statusCode == http.StatusNotFound:
 		return nil, exception.CustomerNotFound{Id: customerId}

@@ -38,7 +38,7 @@ func (repo orderRepository) FindById(ctx context.Context, orderId int64) (*model
 	url := strings.Replace(repo.findByIdUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
 
-	res, rawBody, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodGet, url)
+	res, resRawBody, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodGet, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return nil, err
@@ -46,9 +46,12 @@ func (repo orderRepository) FindById(ctx context.Context, orderId int64) (*model
 
 	switch statusCode := res.StatusCode; {
 	case IsStatusCode2XX(statusCode):
-		log.Debugf("Raw body: %s", string(rawBody))
+		log.Debugf("Raw body: %s", string(resRawBody))
 		var order model.Order
-		err = json.Unmarshal(rawBody, &order)
+		if err := json.Unmarshal(resRawBody, &order); err != nil {
+			log.WithFields(model.LoggerFields{"error": err, "rawBody": string(resRawBody)}).Errorf("error decoding res body")
+			return nil, NewUnexpectedError("order repository", statusCode, url)
+		}
 		return &order, nil
 	case statusCode == http.StatusNotFound:
 		return nil, exception.OrderNotFound{Id: orderId}
@@ -65,7 +68,7 @@ func (repo orderRepository) Create(ctx context.Context, order model.Order) (int6
 	orderDTO := dto.NewOrderDTO(order)
 	log.Debugf("orderDTO: %s", orderDTO)
 
-	res, rawBody, err := MakeAndDoRequestWithBody(ctx, log, repo.client, http.MethodPost, url, contentTypeJson, orderDTO)
+	res, resRawBody, err := MakeAndDoRequestWithBody(ctx, log, repo.client, http.MethodPost, url, contentTypeJson, orderDTO)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return 0, err
@@ -73,9 +76,12 @@ func (repo orderRepository) Create(ctx context.Context, order model.Order) (int6
 
 	switch statusCode := res.StatusCode; {
 	case IsStatusCode2XX(statusCode):
-		log.Debugf("Raw body: %s", string(rawBody))
+		log.Debugf("Raw body: %s", string(resRawBody))
 		var orderIdRes dto.IdRes
-		err = json.Unmarshal(rawBody, &orderIdRes)
+		if err := json.Unmarshal(resRawBody, &orderIdRes); err != nil {
+			log.WithFields(model.LoggerFields{"error": err, "rawBody": string(resRawBody)}).Errorf("error decoding res body")
+			return 0, NewUnexpectedError("order repository", statusCode, url)
+		}
 		return orderIdRes.Id, nil
 	case statusCode == http.StatusNotFound:
 		return 0, exception.ProductNotFound{Id: order.Product.Id}
@@ -92,7 +98,7 @@ func (repo orderRepository) Confirm(ctx context.Context, orderId int64) error {
 	url := strings.Replace(repo.confirmUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
 
-	res, rawBody, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodPost, url)
+	res, _, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodPost, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return err
@@ -100,9 +106,6 @@ func (repo orderRepository) Confirm(ctx context.Context, orderId int64) error {
 
 	switch statusCode := res.StatusCode; {
 	case IsStatusCode2XX(statusCode):
-		log.Debugf("Raw body: %s", string(rawBody))
-		var order model.Order
-		err = json.Unmarshal(rawBody, &order)
 		return nil
 	case statusCode == http.StatusNotFound:
 		return exception.OrderNotFound{Id: orderId}
@@ -119,7 +122,7 @@ func (repo orderRepository) Delivered(ctx context.Context, orderId int64) error 
 	url := strings.Replace(repo.deliveredUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
 
-	res, rawBody, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodPost, url)
+	res, _, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodPost, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return err
@@ -127,9 +130,6 @@ func (repo orderRepository) Delivered(ctx context.Context, orderId int64) error 
 
 	switch statusCode := res.StatusCode; {
 	case IsStatusCode2XX(statusCode):
-		log.Debugf("Raw body: %s", string(rawBody))
-		var order model.Order
-		err = json.Unmarshal(rawBody, &order)
 		return nil
 	case statusCode == http.StatusNotFound:
 		return exception.OrderNotFound{Id: orderId}
