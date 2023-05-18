@@ -63,10 +63,10 @@ func (u *PayOrder) Do(ctx context.Context, orderId int64, payment *model.Payment
 }
 
 func (u *PayOrder) sendNotificationsOfPurchasedOrder(ctx context.Context, log model.Logger, order *model.Order) {
-	if err := u.sendNotificationCmd.Do(ctx, model.NewNotificationOrderPayed(model.CustomerRecipientType, order.CustomerId, fmt.Sprintf("%s - Numero de orden: #%v", order.Product.Name, order.Id))); err != nil {
+	if err := u.sendNotificationCmd.Do(ctx, model.NewEmailNotificationOrderPayed(model.CustomerRecipientType, order.CustomerId, fmt.Sprintf("%s - Numero de orden: #%v", order.Product.Name, order.Id))); err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when notify order purchased to customer")
 	}
-	if err := u.sendNotificationCmd.Do(ctx, model.NewNotificationOrderPayed(model.SellerRecipientType, order.Product.SellerId, fmt.Sprintf("%s", order.Product.Name))); err != nil {
+	if err := u.sendNotificationCmd.Do(ctx, model.NewEmailNotificationOrderPayed(model.SellerRecipientType, order.Product.SellerId, fmt.Sprintf("%s", order.Product.Name))); err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when notify order purchased to seller")
 	}
 }

@@ -44,6 +44,7 @@ func NewOrder(customerId, productId int64, deliveryDate time.Time, deliveryAddre
 func (o *Order) WasPaid() bool {
 	return !strings.EqualFold(o.State, PendingOrderState)
 }
+
 func (o *Order) String() string {
 	return util.ParseStruct("Order", o)
 }

@@ -9,6 +9,7 @@ const (
 	CustomerRecipientType = "customer"
 	SellerRecipientType   = "seller"
 	eventPaymentOk        = "purchase_successful"
+	channelEmail          = "email"
 )
 
 type (
@@ -29,9 +30,9 @@ type (
 	}
 )
 
-func NewNotificationOrderPayed(recipientType string, userId int64, detail string) Notification {
+func NewEmailNotificationOrderPayed(recipientType string, userId int64, detail string) Notification {
 	return Notification{
-		Channel: "email",
+		Channel: channelEmail,
 		Event: Event{
 			Name:   eventPaymentOk,
 			Detail: detail,

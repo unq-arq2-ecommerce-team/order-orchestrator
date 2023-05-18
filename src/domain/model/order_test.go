@@ -27,6 +27,21 @@ func Test_Order_New(t *testing.T) {
 	assert.Equal(t, orderExpected, order)
 }
 
+func Test_Order_WasPaid(t *testing.T) {
+	pendingOrder := Order{
+		State: PendingOrderState,
+	}
+	confirmedOrder := Order{
+		State: ConfirmOrderState,
+	}
+	deliveredOrder := Order{
+		State: DeliveredOrderState,
+	}
+	assert.False(t, pendingOrder.WasPaid())
+	assert.True(t, confirmedOrder.WasPaid())
+	assert.True(t, deliveredOrder.WasPaid())
+}
+
 func Test_Order_String(t *testing.T) {
 	order1 := Order{
 		CustomerId:      4,

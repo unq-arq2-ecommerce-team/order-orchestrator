@@ -29,7 +29,7 @@ type (
 	}
 )
 
-// Fill : update payment with order data (orderId, customerId and price in ARS)
+// Fill : update payment with order data (orderId, customerId and price in ARS), override with order data
 func (p *Payment) Fill(order *Order) {
 	p.OrderId = fmt.Sprintf("%v", order.Id)
 	p.CustomerId = fmt.Sprintf("%v", order.CustomerId)
