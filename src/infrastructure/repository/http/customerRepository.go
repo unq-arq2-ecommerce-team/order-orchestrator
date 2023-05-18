@@ -7,7 +7,6 @@ import (
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/model/exception"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/infrastructure/config"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/infrastructure/logger"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -33,15 +32,14 @@ func (repo customerRepository) FindById(ctx context.Context, customerId int64) (
 	url := strings.Replace(repo.findByIdUrl, "{customerId}", strconv.FormatInt(customerId, 10), -1)
 	log = repo.logger.WithFields(logger.Fields{"url": url})
 
-	res, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodGet, url)
+	res, rawBody, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodGet, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return nil, err
 	}
 	switch statusCode := res.StatusCode; {
 	case IsStatusCode2XX(statusCode):
-		rawBody, _ := io.ReadAll(res.Body)
-		log = log.WithFields(logger.Fields{"bodyRaw": rawBody})
+		log.Debugf("Raw body: %s", string(rawBody))
 		var customer model.Customer
 		err = json.Unmarshal(rawBody, &customer)
 		return &customer, nil

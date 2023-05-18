@@ -29,7 +29,7 @@ func (repo notificationRepository) Send(ctx context.Context, notification model.
 
 	log = repo.logger.WithFields(logger.Fields{"url": url})
 
-	res, err := MakeAndDoRequestWithBody(ctx, log, repo.client, http.MethodPost, url, contentTypeJson, notification)
+	res, _, err := MakeAndDoRequestWithBody(ctx, log, repo.client, http.MethodPost, url, contentTypeJson, notification)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return err

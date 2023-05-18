@@ -7,7 +7,6 @@ import (
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/model/exception"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/infrastructure/config"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/infrastructure/dto"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -39,7 +38,7 @@ func (repo orderRepository) FindById(ctx context.Context, orderId int64) (*model
 	url := strings.Replace(repo.findByIdUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
 
-	res, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodGet, url)
+	res, rawBody, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodGet, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return nil, err
@@ -47,8 +46,7 @@ func (repo orderRepository) FindById(ctx context.Context, orderId int64) (*model
 
 	switch statusCode := res.StatusCode; {
 	case IsStatusCode2XX(statusCode):
-		rawBody, _ := io.ReadAll(res.Body)
-		log = log.WithFields(model.LoggerFields{"bodyRaw": rawBody})
+		log.Debugf("Raw body: %s", string(rawBody))
 		var order model.Order
 		err = json.Unmarshal(rawBody, &order)
 		return &order, nil
@@ -67,7 +65,7 @@ func (repo orderRepository) Create(ctx context.Context, order model.Order) (int6
 	orderDTO := dto.NewOrderDTO(order)
 	log.Debugf("orderDTO: %s", orderDTO)
 
-	res, err := MakeAndDoRequestWithBody(ctx, log, repo.client, http.MethodPost, url, contentTypeJson, orderDTO)
+	res, rawBody, err := MakeAndDoRequestWithBody(ctx, log, repo.client, http.MethodPost, url, contentTypeJson, orderDTO)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return 0, err
@@ -75,8 +73,7 @@ func (repo orderRepository) Create(ctx context.Context, order model.Order) (int6
 
 	switch statusCode := res.StatusCode; {
 	case IsStatusCode2XX(statusCode):
-		rawBody, _ := io.ReadAll(res.Body)
-		log = log.WithFields(model.LoggerFields{"bodyRaw": rawBody})
+		log.Debugf("Raw body: %s", string(rawBody))
 		var orderIdRes dto.IdRes
 		err = json.Unmarshal(rawBody, &orderIdRes)
 		return orderIdRes.Id, nil
@@ -95,7 +92,7 @@ func (repo orderRepository) Confirm(ctx context.Context, orderId int64) error {
 	url := strings.Replace(repo.confirmUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
 
-	res, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodPost, url)
+	res, rawBody, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodPost, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return err
@@ -103,8 +100,7 @@ func (repo orderRepository) Confirm(ctx context.Context, orderId int64) error {
 
 	switch statusCode := res.StatusCode; {
 	case IsStatusCode2XX(statusCode):
-		rawBody, _ := io.ReadAll(res.Body)
-		log = log.WithFields(model.LoggerFields{"bodyRaw": rawBody})
+		log.Debugf("Raw body: %s", string(rawBody))
 		var order model.Order
 		err = json.Unmarshal(rawBody, &order)
 		return nil
@@ -123,7 +119,7 @@ func (repo orderRepository) Delivered(ctx context.Context, orderId int64) error 
 	url := strings.Replace(repo.deliveredUrl, "{orderId}", strconv.FormatInt(orderId, 10), -1)
 	log = repo.logger.WithFields(model.LoggerFields{"url": url})
 
-	res, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodPost, url)
+	res, rawBody, err := MakeAndDoRequestWithNoBody(ctx, log, repo.client, http.MethodPost, url)
 	if err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when make and do request http")
 		return err
@@ -131,8 +127,7 @@ func (repo orderRepository) Delivered(ctx context.Context, orderId int64) error 
 
 	switch statusCode := res.StatusCode; {
 	case IsStatusCode2XX(statusCode):
-		rawBody, _ := io.ReadAll(res.Body)
-		log = log.WithFields(model.LoggerFields{"bodyRaw": rawBody})
+		log.Debugf("Raw body: %s", string(rawBody))
 		var order model.Order
 		err = json.Unmarshal(rawBody, &order)
 		return nil

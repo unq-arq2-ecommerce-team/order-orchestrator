@@ -10,6 +10,7 @@ type OrderPaymentReq struct {
 	Method model.Method `json:"method" binding:"required"`
 }
 
+// TODO: Upgrade validation
 func (req OrderPaymentReq) Validate() error {
 	if number, err := strconv.Atoi(req.Method.Details.Number); err != nil || number < 0 {
 		return fmt.Errorf("number is not valid")
