@@ -32,20 +32,56 @@ func Test_Notification_String(t *testing.T) {
 	assert.Equal(t, `[Notification]{"channel":"sms","event":{"name":"event2","detail":"detail2"},"recipient":{"type":"type2","id":65}}`, n2.String())
 }
 
-func Test_NewEmailNotificationOrderPayed(t *testing.T) {
-	recientType, userId, customDetail := "recientType", int64(21), "some detail bla bla"
-	notification := NewEmailNotificationOrderPayed(recientType, userId, customDetail)
+func Test_NewEmailNotificationOrderPayedForCustomer(t *testing.T) {
+	recipientType, userId := CustomerRecipientType, int64(99)
+	orderId, productName, productPrice := int64(123), "Yerba Matex", float64(99.99)
+	order := anyOrderWithIdAndProductNameAndPrice(orderId, productPrice, productName)
+	expectedDetail := "Yerba Matex - $99.99 - Numero de orden: #123"
+
+	notification := NewEmailNotificationOrderPayed(recipientType, userId, order)
 	expectedNotification := Notification{
 		Channel: channelEmail,
 		Event: Event{
 			Name:   eventPaymentOk,
-			Detail: customDetail,
+			Detail: expectedDetail,
 		},
 		Recipient: Recipient{
-			Type: recientType,
+			Type: recipientType,
 			Id:   userId,
 		},
 	}
 
 	assert.Equal(t, expectedNotification, notification)
+}
+
+func Test_NewEmailNotificationOrderPayedForNoCustomer(t *testing.T) {
+	recipientType, userId := SellerRecipientType, int64(99)
+	orderId, productName, productPrice := int64(123), "Yerba Matex", float64(99.99)
+	order := anyOrderWithIdAndProductNameAndPrice(orderId, productPrice, productName)
+	expectedDetail := "Yerba Matex - $99.99"
+
+	notification := NewEmailNotificationOrderPayed(recipientType, userId, order)
+	expectedNotification := Notification{
+		Channel: channelEmail,
+		Event: Event{
+			Name:   eventPaymentOk,
+			Detail: expectedDetail,
+		},
+		Recipient: Recipient{
+			Type: recipientType,
+			Id:   userId,
+		},
+	}
+
+	assert.Equal(t, expectedNotification, notification)
+}
+
+func anyOrderWithIdAndProductNameAndPrice(id int64, productPrice float64, productName string) Order {
+	return Order{
+		Id: id,
+		Product: Product{
+			Name:  productName,
+			Price: productPrice,
+		},
+	}
 }

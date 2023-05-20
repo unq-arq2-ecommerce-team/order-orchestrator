@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/action/command"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/action/query"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/model"
@@ -16,7 +15,10 @@ type PayOrder struct {
 	payOrderCmd         command.PayOrder
 }
 
-func NewPayOrder(baseLogger model.Logger, findOrderByIdQuery query.FindOrderById, payOrderCmd command.PayOrder, confirmOrderCmd command.ConfirmOrder, sendNotificationCmd command.SendNotification) *PayOrder {
+func NewPayOrder(
+	baseLogger model.Logger, findOrderByIdQuery query.FindOrderById, payOrderCmd command.PayOrder,
+	confirmOrderCmd command.ConfirmOrder, sendNotificationCmd command.SendNotification,
+) *PayOrder {
 	return &PayOrder{
 		baseLogger:          baseLogger.WithFields(model.LoggerFields{"useCase": "PayOrder"}),
 		findOrderByIdQuery:  findOrderByIdQuery,
@@ -57,16 +59,18 @@ func (u *PayOrder) Do(ctx context.Context, orderId int64, payment *model.Payment
 		return err
 	}
 
+	//TODO: go async call brokes tests (research and change) go u.sendNoti...
 	u.sendNotificationsOfPurchasedOrder(ctx, log, order)
+
 	log.Infof("successfully paid order")
 	return nil
 }
 
 func (u *PayOrder) sendNotificationsOfPurchasedOrder(ctx context.Context, log model.Logger, order *model.Order) {
-	if err := u.sendNotificationCmd.Do(ctx, model.NewEmailNotificationOrderPayed(model.CustomerRecipientType, order.CustomerId, fmt.Sprintf("%s - Numero de orden: #%v", order.Product.Name, order.Id))); err != nil {
+	if err := u.sendNotificationCmd.Do(ctx, model.NewEmailNotificationOrderPayed(model.CustomerRecipientType, order.CustomerId, *order)); err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when notify order purchased to customer")
 	}
-	if err := u.sendNotificationCmd.Do(ctx, model.NewEmailNotificationOrderPayed(model.SellerRecipientType, order.Product.SellerId, fmt.Sprintf("%s", order.Product.Name))); err != nil {
+	if err := u.sendNotificationCmd.Do(ctx, model.NewEmailNotificationOrderPayed(model.SellerRecipientType, order.Product.SellerId, *order)); err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when notify order purchased to seller")
 	}
 }

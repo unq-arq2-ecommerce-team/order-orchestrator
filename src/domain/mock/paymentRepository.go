@@ -36,7 +36,7 @@ func (m *MockPaymentRepository) EXPECT() *MockPaymentRepositoryMockRecorder {
 }
 
 // MakePayment mocks base method.
-func (m *MockPaymentRepository) MakePayment(ctx context.Context, payment model.Payment) error {
+func (m *MockPaymentRepository) MakePayment(ctx context.Context, payment *model.Payment) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MakePayment", ctx, payment)
 	ret0, _ := ret[0].(error)

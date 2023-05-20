@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"fmt"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/util"
 )
 
@@ -30,17 +31,26 @@ type (
 	}
 )
 
-func NewEmailNotificationOrderPayed(recipientType string, userId int64, detail string) Notification {
+func NewEmailNotificationOrderPayed(recipientType string, userId int64, order Order) Notification {
 	return Notification{
 		Channel: channelEmail,
 		Event: Event{
 			Name:   eventPaymentOk,
-			Detail: detail,
+			Detail: getDetailByUserType(recipientType, order),
 		},
 		Recipient: Recipient{
 			Type: recipientType,
 			Id:   userId,
 		},
+	}
+}
+
+func getDetailByUserType(userType string, order Order) string {
+	switch userType {
+	case CustomerRecipientType:
+		return fmt.Sprintf("%s - $%v - Numero de orden: #%v", order.Product.Name, order.Product.Price, order.Id)
+	default:
+		return fmt.Sprintf("%s - $%v", order.Product.Name, order.Product.Price)
 	}
 }
 
