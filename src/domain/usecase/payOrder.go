@@ -59,8 +59,8 @@ func (u *PayOrder) Do(ctx context.Context, orderId int64, payment *model.Payment
 		return err
 	}
 
-	//TODO: go async call brokes tests (research and change) go u.sendNoti...
-	u.sendNotificationsOfPurchasedOrder(ctx, log, order)
+	// Async call
+	go u.sendNotificationsOfPurchasedOrder(ctx, log, order)
 
 	log.Infof("successfully paid order")
 	return nil

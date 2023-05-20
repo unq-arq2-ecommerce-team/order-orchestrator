@@ -9,6 +9,7 @@ import (
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/action/query"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/mock"
 	"github.com/unq-arq2-ecommerce-team/order-orchestrator/src/domain/model"
+	"sync"
 	"testing"
 )
 
@@ -22,10 +23,19 @@ func Test_GivenPayOrderUseCaseAndOrderIdAndPayment_WhenDo_ThenReturnNoError(t *t
 	order := anyOrderWithIdAndState(orderId, model.PendingOrderState)
 	paymentForRepo := *payment
 	paymentForRepo.Fill(order)
+
+	//Async calls
+	waitGroup := sync.WaitGroup{}
+	timesCallRepoFromAsync := 2
+	waitGroup.Add(timesCallRepoFromAsync)
+
 	mocks.OrderRepo.EXPECT().FindById(ctx, orderId).Return(order, nil)
 	mocks.PaymentRepo.EXPECT().MakePayment(ctx, &paymentForRepo).Return(nil)
 	mocks.OrderRepo.EXPECT().Confirm(ctx, order.Id).Return(nil)
-	mocks.NotificationRepo.EXPECT().Send(ctx, gomock.Any()).Return(nil).Times(2)
+	//Async repo call
+	mocks.NotificationRepo.EXPECT().Send(ctx, gomock.Any()).Do(
+		func(arg0, arg1 interface{}) { waitGroup.Done() },
+	).Return(nil).Times(2)
 
 	err := payOrderUseCase.Do(ctx, orderId, payment)
 
@@ -42,13 +52,22 @@ func Test_GivenPayOrderUseCaseAndOrderIdAndPaymentAndNotificationError_WhenDo_Th
 	order := anyOrderWithIdAndState(orderId, model.PendingOrderState)
 	paymentForRepo := *payment
 	paymentForRepo.Fill(order)
+
+	//Async calls
+	waitGroup := sync.WaitGroup{}
+	timesCallRepoFromAsync := 2
+	waitGroup.Add(timesCallRepoFromAsync)
+
 	mocks.OrderRepo.EXPECT().FindById(ctx, orderId).Return(order, nil)
 	mocks.PaymentRepo.EXPECT().MakePayment(ctx, &paymentForRepo).Return(nil)
 	mocks.OrderRepo.EXPECT().Confirm(ctx, order.Id).Return(nil)
-	mocks.NotificationRepo.EXPECT().Send(ctx, gomock.Any()).Return(fmt.Errorf("notification repo error")).Times(2)
+	//Async repo call
+	mocks.NotificationRepo.EXPECT().Send(ctx, gomock.Any()).Do(
+		func(arg0, arg1 interface{}) { waitGroup.Done() },
+	).Return(fmt.Errorf("some error raise")).Times(2)
 
 	err := payOrderUseCase.Do(ctx, orderId, payment)
-
+	waitGroup.Wait()
 	assert.NoError(t, err)
 }
 
