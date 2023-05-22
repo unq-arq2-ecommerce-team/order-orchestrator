@@ -60,13 +60,15 @@ func (u *PayOrder) Do(ctx context.Context, orderId int64, payment *model.Payment
 	}
 
 	// Async call
-	go u.sendNotificationsOfPurchasedOrder(ctx, log, order)
+	go u.sendNotificationsOfPurchasedOrder(log, order)
 
 	log.Infof("successfully paid order")
 	return nil
 }
 
-func (u *PayOrder) sendNotificationsOfPurchasedOrder(ctx context.Context, log model.Logger, order *model.Order) {
+func (u *PayOrder) sendNotificationsOfPurchasedOrder(log model.Logger, order *model.Order) {
+	// create new ctx for no cancel from parent
+	ctx := context.Background()
 	if err := u.sendNotificationCmd.Do(ctx, model.NewEmailNotificationOrderPayed(model.CustomerRecipientType, order.CustomerId, *order)); err != nil {
 		log.WithFields(model.LoggerFields{"error": err}).Error("error when notify order purchased to customer")
 	}
