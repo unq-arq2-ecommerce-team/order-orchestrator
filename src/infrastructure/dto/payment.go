@@ -12,11 +12,14 @@ type OrderPaymentReq struct {
 
 // TODO: Upgrade validation
 func (req OrderPaymentReq) Validate() error {
-	if number, err := strconv.Atoi(req.Method.Details.Number); err != nil || number < 0 {
-		return fmt.Errorf("number is not valid")
+	if !model.ValidPaymentMethodType(req.Method.Type) {
+		return fmt.Errorf("payment method.type invalid. Please try with one of these: %s", model.GetPaymentMethodTypes())
 	}
-	if cvv, err := strconv.Atoi(req.Method.Details.Cvv); err != nil || cvv < 0 {
-		return fmt.Errorf("cvv is not valid")
+	if _, err := strconv.ParseUint(req.Method.Details.Number, 10, 64); err != nil {
+		return fmt.Errorf("number is not valid. Please try with format: 1234123412341234")
+	}
+	if _, err := strconv.ParseUint(req.Method.Details.Cvv, 10, 64); err != nil {
+		return fmt.Errorf("cvv is not valid. Please try with format: 999")
 	}
 	return nil
 }

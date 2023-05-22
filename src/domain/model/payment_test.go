@@ -22,8 +22,8 @@ func Test_Payment_String(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, `[Payment]{"customer_id":"","order_id":"","amount":0,"currency":"","method":{"type":"","details":{"number":"","expiration_date":"","cvv":"","holder_name":""}}}`, p1.String())
-	assert.Equal(t, `[Payment]{"customer_id":"2","order_id":"4","amount":105.95,"currency":"ARS","method":{"type":"creditcard","details":{"number":"1234123412341234","expiration_date":"12/2029","cvv":"987","holder_name":"Lalo Landa"}}}`, p2.String())
+	assert.Equal(t, `[Payment]{"customer_id":"","order_id":"","amount":0,"currency":"","method":{"type":"","details":{"card_number":"","expiration_date":"","cvv":"","holder_name":""}}}`, p1.String())
+	assert.Equal(t, `[Payment]{"customer_id":"2","order_id":"4","amount":105.95,"currency":"ARS","method":{"type":"creditcard","details":{"card_number":"1234123412341234","expiration_date":"12/2029","cvv":"987","holder_name":"Lalo Landa"}}}`, p2.String())
 }
 
 func Test_Payment_Fill(t *testing.T) {
@@ -53,4 +53,15 @@ func Test_Payment_Fill(t *testing.T) {
 	assert.Equal(t, "87", payment.CustomerId)
 	assert.Equal(t, priceAmount, payment.Amount)
 	assert.Equal(t, CurrencyARS, payment.Currency)
+}
+
+func Test_GetPaymentMethodTypes(t *testing.T) {
+	assert.Equal(t, "creditCard", GetPaymentMethodTypes())
+}
+
+func Test_ValidPaymentMethodType(t *testing.T) {
+	assert.True(t, ValidPaymentMethodType("creditCard"))
+	assert.False(t, ValidPaymentMethodType("creditcard"))
+	assert.False(t, ValidPaymentMethodType("sarasa"))
+	assert.False(t, ValidPaymentMethodType(""))
 }
